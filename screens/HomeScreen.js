@@ -1,4 +1,5 @@
 import {
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -6,57 +7,134 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import CustomListItem from "../components/CustomListItem";
-import { Avatar } from "@rneui/themed";
+import { Avatar, Icon, SearchBar } from "@rneui/themed";
 import { auth } from "../firebase";
+import { AntDesign } from "@expo/vector-icons";
+import CustomFloatingButton from "../components/CustomFloatingButton";
+import CustomDropdown from "../components/CustomDropdown";
 
 const HomeScreen = ({ navigation }) => {
+  const [isSearch, setIsSearch] = useState(false);
   const signOutUser = () => {
     auth.signOut().then(() => {
-        navigation.replace("Login");
+      navigation.replace("Login");
+    });
+  };
+
+  const menuOptions = [
+    { text: "New group", value: null },
+    { text: "Mark all read", value: () => alert("Hai") },
+    { text: "Invite friends", value: () => alert("Halo") },
+    { text: "Settings", value: null },
+    { text: "Notification profile", value: null },
+  ];
+
+  const onSearch = () => {
+    setIsSearch(true);
+    navigation.setOptions({
+      headerTitle: () => (
+        <View style={{ width: "95%", marginLeft: 0 }}>
+          <SearchBar
+            placeholder="Search"
+            platform={Platform.OS == "ios" ? "ios" : "android"}
+            onCancel={() => {
+              setIsSearch(false);
+            }}
+          />
+        </View>
+      ),
+      headerLeft: () => null,
+      headerRight: () => null,
     });
   };
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      title: "Signal",
-      headerStyle: { backgroundColor: "#fff" },
-      headerTitleStyle: { color: "black" },
-      headerTintColor: "black",
-      headerLeft: () => (
-        <View style={{ marginRight: 20, marginLeft: 10 }}>
-          <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
-            {auth?.currentUser?.photoURL ? (
-              <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
-            ) : (
-              <Avatar
-                rounded
-                title={auth?.currentUser?.displayName[0].toLowerCase()}
-                titleStyle={{ color: "white" }}
-                containerStyle={{ backgroundColor: "#2C6BED" }}
-              />
-            )}
-          </TouchableOpacity>
-        </View>
-      ),
-      headerRight: () => (
-        <View style={{ marginRight: 10 }}>
-            
-        </View>
-      )
-    });
-  }, []);
+    if (!isSearch) {
+      navigation.setOptions({
+        title: "Signal",
+        headerTitle: () => (
+          <Text style={{ fontWeight: "500", fontSize: 18 }}>Signal</Text>
+        ),
+        headerStyle: { backgroundColor: "#fff" },
+        headerTitleStyle: { color: "black" },
+        headerTintColor: "black",
+        headerLeft: () => (
+          <View style={{ marginRight: 20, marginLeft: 10 }}>
+            <TouchableOpacity activeOpacity={0.5} onPress={signOutUser}>
+              {auth?.currentUser?.photoURL ? (
+                <Avatar rounded source={{ uri: auth?.currentUser?.photoURL }} />
+              ) : (
+                <Avatar
+                  rounded
+                  title={auth?.currentUser?.displayName[0].toLowerCase()}
+                  titleStyle={{ color: "white" }}
+                  containerStyle={{ backgroundColor: "#2C6BED" }}
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        ),
+        headerRight: () => (
+          <SafeAreaView>
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <TouchableOpacity
+                activeOpacity={0.5}
+                onPress={onSearch}
+                style={{ marginRight: 20 }}
+              >
+                <AntDesign name="search1" size={24} color="black" />
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.5} onPress={onSearch}>
+                <CustomDropdown menuOptions={menuOptions}>
+                  <Icon
+                    name="more-vert"
+                    size={24}
+                    color="black"
+                    type="material"
+                  />
+                </CustomDropdown>
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        ),
+      });
+    }
+  }, [isSearch]);
 
   return (
     <SafeAreaView>
-      <ScrollView>
+      <ScrollView style={styles.container}>
         <CustomListItem />
       </ScrollView>
+      <View style={styles.fabContainer}>
+        <CustomFloatingButton
+          iconName={"camera-outline"}
+          iconType={"material-community"}
+          customStyle={{ marginBottom: 15 }}
+          color={"#EEEEEE"}
+        />
+        <CustomFloatingButton
+          iconName={"pencil"}
+          iconType={"octicon"}
+          color={"#D3EAFF"}
+        />
+      </View>
     </SafeAreaView>
   );
 };
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    height: "100%",
+    backgroundColor: "#fff",
+  },
+  fabContainer: {
+    position: "absolute",
+    bottom: 15,
+    right: 15,
+  },
+});

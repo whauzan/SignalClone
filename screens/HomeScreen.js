@@ -7,21 +7,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import CustomListItem from "../components/CustomListItem";
 import { Avatar, Icon, SearchBar } from "@rneui/themed";
-import { auth } from "../firebase";
-import { AntDesign } from "@expo/vector-icons";
+import { auth, db } from "../firebase";
 import CustomFloatingButton from "../components/CustomFloatingButton";
 import CustomDropdown from "../components/CustomDropdown";
+import { collection, onSnapshot } from "firebase/firestore";
+import { StatusBar } from "expo-status-bar";
 
 const HomeScreen = ({ navigation }) => {
+  const [chats, setChats] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
-  const signOutUser = () => {
-    auth.signOut().then(() => {
-      navigation.replace("Login");
-    });
-  };
 
   const menuOptions = [
     { text: "New group", value: null },
@@ -30,6 +27,12 @@ const HomeScreen = ({ navigation }) => {
     { text: "Settings", value: null },
     { text: "Notification profile", value: null },
   ];
+
+  const signOutUser = () => {
+    auth.signOut().then(() => {
+      navigation.replace("Login");
+    });
+  };
 
   const onSearch = () => {
     setIsSearch(true);
@@ -49,6 +52,25 @@ const HomeScreen = ({ navigation }) => {
       headerRight: () => null,
     });
   };
+
+  const enterChat = (id, chatName) => {
+    navigation.navigate("Chat", { id, chatName });
+  };
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "chats"), (snapshot) => {
+      setChats(
+        snapshot.docs
+          .sort((a, b) => b.data().createdAt - a.data().createdAt)
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+      );
+    });
+
+    return unsubscribe;
+  }, []);
 
   useLayoutEffect(() => {
     if (!isSearch) {
@@ -78,15 +100,15 @@ const HomeScreen = ({ navigation }) => {
         ),
         headerRight: () => (
           <SafeAreaView>
-            <View style={{ flex: 1, flexDirection: "row" }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
               <TouchableOpacity
                 activeOpacity={0.5}
                 onPress={onSearch}
                 style={{ marginRight: 20 }}
               >
-                <AntDesign name="search1" size={24} color="black" />
+                <Icon name="search1" size={24} color="black" type="antdesign" />
               </TouchableOpacity>
-              <TouchableOpacity activeOpacity={0.5} onPress={onSearch}>
+              <TouchableOpacity activeOpacity={0.5}>
                 <CustomDropdown menuOptions={menuOptions}>
                   <Icon
                     name="more-vert"
@@ -105,8 +127,11 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView>
+      <StatusBar style="dark" />
       <ScrollView style={styles.container}>
-        <CustomListItem />
+        {chats?.map(({ id, chatName }) => (
+          <CustomListItem id={id} chatName={chatName} enterChat={enterChat} key={id} />
+        ))}
       </ScrollView>
       <View style={styles.fabContainer}>
         <CustomFloatingButton
@@ -119,6 +144,7 @@ const HomeScreen = ({ navigation }) => {
           iconName={"pencil"}
           iconType={"octicon"}
           color={"#D3EAFF"}
+          onPress={() => navigation.navigate("AddChat")}
         />
       </View>
     </SafeAreaView>

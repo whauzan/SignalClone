@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { FAB } from '@rneui/themed';
 
-const CustomFloatingButton = ({ iconName, iconType, color, customStyle }) => {
+const CustomFloatingButton = ({ iconName, iconType, color, customStyle, onPress }) => {
   return (
     <FAB
       icon={{
@@ -14,6 +14,7 @@ const CustomFloatingButton = ({ iconName, iconType, color, customStyle }) => {
       }}
       color={color}
       containerStyle={[styles.fab, customStyle]}
+      onPress={onPress}
     />
   );
 }

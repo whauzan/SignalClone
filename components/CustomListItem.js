@@ -5,170 +5,17 @@ import { ListItem, Avatar } from "@rneui/themed";
 const CustomListItem = ({ id, chatName, enterChat }) => {
   return (
     <>
-      <ListItem>
+      <ListItem onPress={() => enterChat(id, chatName)} bottomDivider>
         <Avatar
           rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
+          containerStyle={{ backgroundColor: "#EEEEEE" }}
+          title={chatName[0].toUpperCase()}
+          titleStyle={{ color: "#999999" }}
           size={45}
         />
         <ListItem.Content>
           <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
-          </ListItem.Title>
-          <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
-          </ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
-      <ListItem>
-        <Avatar
-          rounded
-          source={{
-            uri: "https://cencup.com/wp-content/uploads/2019/07/avatar-placeholder.png",
-          }}
-          size={45}
-        />
-        <ListItem.Content>
-          <ListItem.Title style={{ fontWeight: "800" }}>
-            This is Chat
+            {chatName}
           </ListItem.Title>
           <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
             This is a Message

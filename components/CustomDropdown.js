@@ -17,11 +17,16 @@ const CustomDropdown = ({ children, menuOptions }) => {
         }}
       >
         {menuOptions.map((option, index) => (
-          <MenuOption key={index} value={index} onSelect={option.value}>
+          <MenuOption
+            key={index}
+            value={index}
+            onSelect={option.value}
+            style={{ padding: 15 }}
+          >
             <Text
               style={[
                 { fontSize: 17, color: "black" },
-                index !== menuOptions.length - 1 ? { marginBottom: 15 } : null,
+                // index !== menuOptions.length - 1 ? { marginBottom: 15 } : null,
               ]}
             >
               {option.text}
@@ -41,7 +46,6 @@ const styles = StyleSheet.create({
     top: 30,
     right: 5,
     width: 220,
-    padding: 10,
     borderRadius: 10,
     backgroundColor: "#EEEEEE",
   },

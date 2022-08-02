@@ -1,8 +1,31 @@
 import { StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ListItem, Avatar } from "@rneui/themed";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const CustomListItem = ({ id, chatName, enterChat }) => {
+  const [chatMessages, setChatMessages] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(
+        collection(doc(db, "chats", id), "messages"),
+        orderBy("timestamp", "asc")
+      ),
+      (snapshot) => {
+        setChatMessages(snapshot.docs.map((doc) => doc.data()));
+      }
+    );
+
+    return unsubscribe;
+  }, []);
   return (
     <>
       <ListItem onPress={() => enterChat(id, chatName)} bottomDivider>
@@ -18,7 +41,11 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
             {chatName}
           </ListItem.Title>
           <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-            This is a Message
+            {`${
+              auth.currentUser.email === chatMessages?.[0]?.email
+                ? "You: "
+                : chatMessages?.[0]?.displayName
+            } ${chatMessages?.[0]?.message}`}
           </ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>

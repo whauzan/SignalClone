@@ -13,7 +13,7 @@ import { Avatar, Icon, SearchBar } from "@rneui/themed";
 import { auth, db } from "../firebase";
 import CustomFloatingButton from "../components/CustomFloatingButton";
 import CustomDropdown from "../components/CustomDropdown";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { StatusBar } from "expo-status-bar";
 
 const HomeScreen = ({ navigation }) => {
@@ -58,16 +58,17 @@ const HomeScreen = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "chats"), (snapshot) => {
-      setChats(
-        snapshot.docs
-          .sort((a, b) => b.data().createdAt - a.data().createdAt)
-          .map((doc) => ({
+    const unsubscribe = onSnapshot(
+      query(collection(db, "chats"), orderBy("createdAt", "desc")),
+      (snapshot) => {
+        setChats(
+          snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }))
-      );
-    });
+        );
+      }
+    );
 
     return unsubscribe;
   }, []);
@@ -130,7 +131,12 @@ const HomeScreen = ({ navigation }) => {
       <StatusBar style="dark" />
       <ScrollView style={styles.container}>
         {chats?.map(({ id, chatName }) => (
-          <CustomListItem id={id} chatName={chatName} enterChat={enterChat} key={id} />
+          <CustomListItem
+            id={id}
+            chatName={chatName}
+            enterChat={enterChat}
+            key={id}
+          />
         ))}
       </ScrollView>
       <View style={styles.fabContainer}>

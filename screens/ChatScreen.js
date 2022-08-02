@@ -1,4 +1,5 @@
 import {
+  Keyboard,
   KeyboardAvoidingView,
   SafeAreaView,
   ScrollView,
@@ -12,9 +13,20 @@ import React, { useLayoutEffect, useState } from "react";
 import CustomDropdown from "../components/CustomDropdown";
 import { Avatar, Icon } from "@rneui/themed";
 import { StatusBar } from "expo-status-bar";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const ChatScreen = ({ navigation, route }) => {
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const menuOptions = [
     { text: "Dissapearing messages", value: null },
@@ -24,7 +36,35 @@ const ChatScreen = ({ navigation, route }) => {
     { text: "Add to home screen", value: null },
   ];
 
-  const sendMessage = () => {};
+  const sendMessage = async () => {
+    Keyboard.dismiss();
+
+    await addDoc(collection(doc(db, "chats", route.params.id), "messages"), {
+      timestamp: serverTimestamp(),
+      message: input,
+      displayName: auth.currentUser.displayName,
+      email: auth.currentUser.email,
+      photoURL: auth.currentUser.photoURL,
+    });
+
+    setInput("");
+  };
+
+  useLayoutEffect(() => {
+    const unsubscribe = onSnapshot(
+      query(
+        collection(doc(db, "chats", route.params.id), "messages"),
+        orderBy("timestamp", "asc")
+      ),
+      (snapshot) => {
+        setMessages(
+          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
+      }
+    );
+
+    return unsubscribe;
+  }, [route]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -107,10 +147,51 @@ const ChatScreen = ({ navigation, route }) => {
         keyboardVerticalOffset={{ number: 0 }}
       >
         <>
-          <ScrollView></ScrollView>
+          <ScrollView contentContainerStyle={{ paddingTop: 15 }}>
+            {messages?.map(
+              ({ id, message, email, displayName, photoURL, timestamp }) =>
+                email === auth.currentUser.email ? (
+                  <View key={id} style={styles.sender}>
+                    <Avatar
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        right: -5,
+                        backgroundColor: "#2C6BED",
+                      }}
+                      rounded
+                      size={30}
+                      source={photoURL ? { uri: photoURL } : null}
+                      title={photoURL ? null : displayName[0].toLowerCase()}
+                      titleStyle={{ color: "white" }}
+                    />
+                    <Text style={styles.senderText}>{message}</Text>
+                  </View>
+                ) : (
+                  <View key={id} style={styles.reciever}>
+                    <Avatar
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -15,
+                        left: -5,
+                        backgroundColor: "#EEEEEE",
+                      }}
+                      rounded
+                      size={30}
+                      source={photoURL ? { uri: photoURL } : null}
+                      title={photoURL ? null : displayName[0].toLowerCase()}
+                      titleStyle={{ color: "black" }}
+                    />
+                    <Text style={styles.recieverText}>{message}</Text>
+                    <Text style={styles.recieverName}>{displayName}</Text>
+                  </View>
+                )
+            )}
+          </ScrollView>
           <View style={styles.footer}>
             <TextInput
               onChangeText={(text) => setInput(text)}
+              onSubmitEditing={sendMessage}
               placeholder="Signal Message"
               style={styles.textInput}
               value={input}
@@ -164,5 +245,42 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: "center",
     justifyContent: "center",
+  },
+  sender: {
+    padding: 15,
+    backgroundColor: "#EEEEEE",
+    alignSelf: "flex-end",
+    borderRadius: 20,
+    marginRight: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  senderText: {
+    fontWeight: "500",
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  reciever: {
+    padding: 15,
+    backgroundColor: "#2B68E6",
+    alignSelf: "flex-start",
+    borderRadius: 20,
+    marginLeft: 15,
+    marginBottom: 20,
+    maxWidth: "80%",
+    position: "relative",
+  },
+  recieverName: {
+    left: 10,
+    paddingRight: 10,
+    fontSize: 10,
+    color: "white",
+  },
+  recieverText: {
+    color: "white",
+    fontWeight: "500",
+    marginLeft: 10,
+    marginBottom: 10,
   },
 });
